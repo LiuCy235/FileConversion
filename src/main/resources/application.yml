@@ -1,0 +1,18 @@
+server:
+  port: 8089
+
+# 文件上传配置
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB  # 单个文件最大大小
+      max-request-size: 10MB  # 整个请求最大大小
+
+logging:
+  file:
+    name: logs/application.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: info
+    com.dream.change: debug

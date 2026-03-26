@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 转 Word 工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>PDF 转 Word 工具</h1>
+        
+        <form id="pdfForm">
+            <div class="form-group">
+                <label for="pdfFile">选择 PDF 文件：</label>
+                <input type="file" id="pdfFile" name="file" accept=".pdf" required>
+            </div>
+            <button type="submit">转换为 Word</button>
+        </form>
+        
+        <div id="status" class="status hidden"></div>
+    </div>
+    
+    <!-- 弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">提示</h2>
+            </div>
+            <div class="modal-body" id="modal-body">
+                消息内容
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

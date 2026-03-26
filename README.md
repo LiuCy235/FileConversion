@@ -150,41 +150,32 @@ logging:
 ## 项目结构
 
 ```
-FileChange/
+FileConversion/
 ├── src/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/dream/change/
+│   │   │       ├── annotation/      # 注解类
+│   │   │       ├── aspect/          # 切面类
 │   │   │       ├── config/          # 配置类
 │   │   │       ├── controller/      # 控制器
 │   │   │       ├── service/         # 服务层
 │   │   │       └── FileChangeApplication.java  # 应用主类
 │   │   ├── resources/
 │   │   │   ├── static/             # 静态资源
+│   │   │   │   ├── css/             # 样式文件
+│   │   │   │   │   └── style.css
+│   │   │   │   ├── js/              # JavaScript文件
+│   │   │   │   │   └── script.js
 │   │   │   │   └── index.html      # 前端页面
 │   │   │   └── application.yml     # 配置文件
-│   └── test/                       # 测试代码
-├── target/                         # 构建输出
-├── logs/                           # 日志文件
 ├── pom.xml                         # Maven配置
-├── DEPLOYMENT.md                   # 部署指南
 └── README.md                       # 项目说明
 ```
 
 ## 贡献
 
 欢迎提交Issue和Pull Request来改进这个项目。
-
-## 许可证
-
-本项目采用MIT许可证。
-
-## 联系方式
-
-如果您有任何问题或建议，请通过以下方式联系我们：
-
-- 邮箱：support@example.com
-- GitHub：https://github.com/example/pdf-to-word-service
 
 ---
 

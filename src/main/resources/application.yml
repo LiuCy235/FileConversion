@@ -8,6 +8,12 @@ spring:
       max-file-size: 10MB  # 单个文件最大大小
       max-request-size: 10MB  # 整个请求最大大小
 
+# LibreOffice 配置
+libreoffice:
+  home:
+    windows: "C:\\Program Files\\LibreOffice"
+    linux: "/usr/lib/libreoffice"
+
 logging:
   file:
     name: logs/application.log

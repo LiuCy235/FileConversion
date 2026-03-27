@@ -2,6 +2,7 @@ package com.dream.change.controller;
 
 import com.dream.change.annotation.NoRepeatSubmit;
 import com.dream.change.service.PdfToWordService;
+import com.dream.change.service.WordToPdfService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,12 @@ public class FileController {
     @Autowired
     private PdfToWordService pdfToWordService;
 
+    @Autowired
+    private WordToPdfService wordToPdfService;
+
     /**
      * 检查 LibreOffice 是否安装
+     *
      * @return 检查结果
      */
     @GetMapping("/check/libreoffice")
@@ -40,6 +45,7 @@ public class FileController {
 
     /**
      * 上传 PDF 文件并转换为 Word
+     *
      * @param file 上传的 PDF 文件
      * @return 转换后的 Word 文件
      */
@@ -47,7 +53,7 @@ public class FileController {
     @NoRepeatSubmit(3) // 3秒内防止重复提交
     public ResponseEntity<?> convertPdfToWord(@RequestParam("file") MultipartFile file) {
         logger.info("接收到 PDF 转 Word 请求，文件名: {}", file.getOriginalFilename());
-        
+
         // 检查文件是否为空
         if (file.isEmpty()) {
             logger.warn("上传文件为空");
@@ -96,7 +102,7 @@ public class FileController {
             // 设置响应头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", wordFile.getName());
+            headers.setContentDispositionFormData("attachment", file.getName()+".docx");
 
             // 构建响应
             ResponseEntity<byte[]> response = ResponseEntity.ok()
@@ -116,6 +122,64 @@ public class FileController {
             return response;
         } catch (Exception e) {
             logger.error("PDF 转 Word 失败: {}", e.getMessage(), e);
+            // 检查是否是防重复提交错误
+            if (e.getMessage().contains("请勿重复提交")) {
+                return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"" + e.getMessage() + "\"}");
+            }
+            return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"转换失败：" + e.getMessage() + "\"}");
+        }
+    }
+
+    /**
+     * 上传 Word 文件并转换为 PDF
+     *
+     * @param file 上传的 Word 文件
+     * @return 转换后的 PDF 文件
+     */
+    @PostMapping("/word-to-pdf")
+    @NoRepeatSubmit(3) // 3秒内防止重复提交
+    public ResponseEntity<?> convertWordToPdf(@RequestParam("file") MultipartFile file) {
+        logger.info("接收到 Word 转 PDF 请求，文件名: {}", file.getOriginalFilename());
+
+        // 检查文件是否为空
+        if (file.isEmpty()) {
+            logger.warn("上传文件为空");
+            return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"请选择要上传的 Word 文件\"}");
+        }
+
+        // 检查文件类型
+        String fileName = file.getOriginalFilename().toLowerCase();
+        if (!fileName.endsWith(".docx") && !fileName.endsWith(".doc")) {
+            logger.warn("文件类型错误: {}", file.getOriginalFilename());
+            return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"请上传 Word 格式的文件 (.docx 或 .doc)\"}");
+        }
+
+        // 检查文件大小（限制为10MB）
+        long maxFileSize = 10 * 1024 * 1024; // 10MB
+        if (file.getSize() > maxFileSize) {
+            logger.warn("文件大小超过限制: {} bytes", file.getSize());
+            return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"文件大小超过限制，最大允许 10MB\"}");
+        }
+
+        try {
+            // 转换 Word 为 PDF
+            byte[] pdfBytes = wordToPdfService.convertWordToPdf(file);
+            logger.debug("Word 转 PDF 成功，文件大小: {} bytes", pdfBytes.length);
+
+            // 设置响应头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", file.getName() + ".pdf");
+
+            // 构建响应
+            ResponseEntity<byte[]> response = ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+
+            logger.info("Word 转 PDF 成功，文件名: {}", file.getOriginalFilename());
+            return response;
+        } catch (Exception e) {
+            logger.error("Word 转 PDF 失败: {}", e.getMessage(), e);
             // 检查是否是防重复提交错误
             if (e.getMessage().contains("请勿重复提交")) {
                 return ResponseEntity.badRequest().body("{\"status\": \"error\",\"message\": \"" + e.getMessage() + "\"}");
